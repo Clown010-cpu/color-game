@@ -2,11 +2,10 @@ import processing.sound.*;
 
 SoundFile music, successSound, failureSound;
 
-color lightBlue = #ADD8E6; 
-color white = #FFFFFF;     
-color green = #3EF702;    
-color red = #FF0307;       
-
+color lightBlue = #ADD8E6;  
+color white = #FFFFFF;      
+color green = #3EF702;      
+color red = #FF0307;        
 
 String[] words = {"RED", "BLUE", "GREEN", "YELLOW", "BLACK", "PURPLE", "ORANGE"};
 color[] colors = {#FF0307, #0365FF, #3EF702, #FBFF1A, #0A0A0A, #800080, #FFA500};
@@ -18,8 +17,10 @@ color textColor;
 boolean isMatch; 
 
 int score = 0;
-int timer = 30;
-int lastTime;
+int roundTime = 3;  // ⏳ Each question lasts 3 seconds
+int timerStart;
+
+float circleSize;  // Used for timer visualization
 
 String currentMode = "intro";
 
@@ -28,7 +29,7 @@ void setup() {
   textAlign(CENTER, CENTER);
   textSize(32);
   
-
+  // 🎵 Load Sounds
   music = new SoundFile(this, sketchPath("MUSIC.mp3"));
   successSound = new SoundFile(this, sketchPath("SUCCESS.wav"));
   failureSound = new SoundFile(this, sketchPath("FAILURE.wav"));
@@ -58,46 +59,49 @@ void showIntro() {
 
   if (mousePressed) {
     currentMode = "game";
-    lastTime = millis();
+    timerStart = millis();
   }
 }
 
 void showGame() {
-  int elapsedTime = (millis() - lastTime) / 1000;
-  timer = max(0, 30 - elapsedTime); 
-
   background(white);
   
- 
   fill(lightBlue);
   rect(0, 0, width / 2, height);  
   fill(white);
   rect(width / 2, 0, width / 2, height);  
 
- 
+  // 🎨 Display Word
   fill(textColor);
   textSize(64);
   text(currentWord, width / 2, height / 3);
 
-
+  // 🟢 "MATCH" Label
   fill(green);
   textSize(36);
   text("MATCH", width / 4, height - 50);
 
- 
+  // 🔴 "NOT MATCH" Label
   fill(red);
   textSize(36);
   text("NOT MATCH", width * 3 / 4, height - 50);
 
+  // ⏳ Timer Visualization (Expanding Circle)
+  float elapsedTime = (millis() - timerStart) / 1000.0;
+  float remainingTime = max(0, roundTime - elapsedTime);
+  circleSize = map(remainingTime, 0, roundTime, 200, 0);
 
+  fill(red, 150);
+  noStroke();
+  ellipse(width / 2, height / 2, circleSize, circleSize);
+
+  // 🏆 Score & Timer
   fill(#050505);
   textSize(24);
   text("Score: " + score, width / 2, 50);
-  text("Time: " + timer, width - 100, 50);
 
-  if (timer == 0) {
-    currentMode = "gameOver";
-    music.stop();
+  if (remainingTime <= 0) {
+    generateNewQuestion();  // Move to next round if time runs out
   }
 }
 
@@ -121,19 +125,30 @@ void generateNewQuestion() {
   int wordIndex = int(random(words.length));
   currentWord = words[wordIndex];
 
-
+  // 🎯 True 50/50 Chance for Match & Not Match
   boolean forceMatch = random(1) < 0.5;
   if (forceMatch) {
     currentColor = colors[wordIndex];  
     isMatch = true;
-  } u
- 
+  } else {
+    int colorIndex;
+    do {
+      colorIndex = int(random(colors.length));
+    } while (colorIndex == wordIndex);  
+    currentColor = colors[colorIndex];
+    isMatch = false;
+  }
 
+  // ✅ Fix visibility: Light colors use black text
   if (currentColor == white || currentColor == lightBlue || currentColor == #FBFF1A) {
-    textColor = #0A0A0A; 
+    textColor = #0A0A0A;
   } else {
     textColor = currentColor;
   }
+
+  // 🔄 Restart Timer & Animation
+  timerStart = millis();
+  circleSize = 200;
 }
 
 void mousePressed() {
@@ -160,8 +175,7 @@ void checkAnswer() {
 
 void resetGame() {
   score = 0;
-  timer = 30;
-  lastTime = millis();
+  timerStart = millis();
   music.loop();
   generateNewQuestion();
 }
