@@ -2,10 +2,10 @@ import processing.sound.*;
 
 SoundFile music, successSound, failureSound;
 
-color lightBlue = #ADD8E6; // Light Blue for "Match" side
-color white = #FFFFFF;     // White for "Not Match" side
-color green = #3EF702;     // Green for "MATCH" label
-color red = #FF0307;       // Red for "NOT MATCH" label
+color lightBlue = #ADD8E6; 
+color white = #FFFFFF;     
+color green = #3EF702;    
+color red = #FF0307;       
 
 
 String[] words = {"RED", "BLUE", "GREEN", "YELLOW", "BLACK", "PURPLE", "ORANGE"};
