@@ -122,19 +122,12 @@ void generateNewQuestion() {
   currentWord = words[wordIndex];
 
 
-  boolean forceMatch = random(1) < 0.6;
+  boolean forceMatch = random(1) < 0.5;
   if (forceMatch) {
     currentColor = colors[wordIndex];  
     isMatch = true;
-  } else {
-    int colorIndex;
-    do {
-      colorIndex = int(random(colors.length));
-    } while (colorIndex == wordIndex);  
-    currentColor = colors[colorIndex];
-    isMatch = false;
-  }
-
+  } u
+ 
 
   if (currentColor == white || currentColor == lightBlue || currentColor == #FBFF1A) {
     textColor = #0A0A0A; 
