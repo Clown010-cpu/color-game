@@ -17,10 +17,10 @@ color textColor;
 boolean isMatch; 
 
 int score = 0;
-int roundTime = 10;  
+int roundTime = 5;  
 int timerStart;
 
-float textSizeAnim; // Word size animation
+float textSizeAnim; 
 
 String currentMode = "intro";
 
@@ -66,7 +66,7 @@ void showGame() {
   float remainingTime = max(0, roundTime - elapsedTime);
   
   if (remainingTime <= 0) {
-    currentMode = "gameOver";  // ⏳ Game Over when timer runs out
+    currentMode = "gameOver";  
     return;
   }
 
@@ -77,23 +77,23 @@ void showGame() {
   fill(white);
   rect(width / 2, 0, width / 2, height);  
 
-  // 🎨 Expanding Word Animation
+  
   textSizeAnim = map(remainingTime, 0, roundTime, 100, 32);
   fill(textColor);
   textSize(textSizeAnim);
   text(currentWord, width / 2, height / 3);
 
-  // 🟢 "MATCH" Label
+ 
   fill(green);
   textSize(36);
   text("MATCH", width / 4, height - 50);
 
-  // 🔴 "NOT MATCH" Label
+
   fill(red);
   textSize(36);
   text("NOT MATCH", width * 3 / 4, height - 50);
 
-  // 🏆 Score & Timer
+ 
   fill(#050505);
   textSize(24);
   text("Score: " + score, width / 2, 50);
@@ -140,7 +140,7 @@ void generateNewQuestion() {
   }
 
   timerStart = millis();
-  textSizeAnim = 32;  // Reset word size
+  textSizeAnim = 32;  
 }
 
 void mousePressed() {
