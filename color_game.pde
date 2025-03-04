@@ -20,16 +20,14 @@ int score = 0;
 int roundTime = 10;  
 int timerStart;
 
-float circleSize;  
+float textSizeAnim; // Word size animation
 
 String currentMode = "intro";
 
 void setup() {
   size(800, 600);
   textAlign(CENTER, CENTER);
-  textSize(32);
   
-
   music = new SoundFile(this, sketchPath("MUSIC.mp3"));
   successSound = new SoundFile(this, sketchPath("SUCCESS.wav"));
   failureSound = new SoundFile(this, sketchPath("FAILURE.wav"));
@@ -64,6 +62,14 @@ void showIntro() {
 }
 
 void showGame() {
+  float elapsedTime = (millis() - timerStart) / 1000.0;
+  float remainingTime = max(0, roundTime - elapsedTime);
+  
+  if (remainingTime <= 0) {
+    currentMode = "gameOver";  // ⏳ Game Over when timer runs out
+    return;
+  }
+
   background(white);
   
   fill(lightBlue);
@@ -71,38 +77,27 @@ void showGame() {
   fill(white);
   rect(width / 2, 0, width / 2, height);  
 
-
+  // 🎨 Expanding Word Animation
+  textSizeAnim = map(remainingTime, 0, roundTime, 100, 32);
   fill(textColor);
-  textSize(64);
+  textSize(textSizeAnim);
   text(currentWord, width / 2, height / 3);
 
-
+  // 🟢 "MATCH" Label
   fill(green);
   textSize(36);
   text("MATCH", width / 4, height - 50);
 
-
+  // 🔴 "NOT MATCH" Label
   fill(red);
   textSize(36);
   text("NOT MATCH", width * 3 / 4, height - 50);
 
-  // ⏳ Timer Visualization (Expanding Circle)
-  float elapsedTime = (millis() - timerStart) / 1000.0;
-  float remainingTime = max(0, roundTime - elapsedTime);
-  circleSize = map(remainingTime, 0, roundTime, 200, 0);
-
-  fill(red, 150);
-  noStroke();
-  ellipse(width / 2, height / 2, circleSize, circleSize);
-
-
+  // 🏆 Score & Timer
   fill(#050505);
   textSize(24);
   text("Score: " + score, width / 2, 50);
-
-  if (remainingTime <= 0) {
-    generateNewQuestion(); 
-  }
+  text("Time: " + int(remainingTime), width - 100, 50);
 }
 
 void showGameOver() {
@@ -125,7 +120,6 @@ void generateNewQuestion() {
   int wordIndex = int(random(words.length));
   currentWord = words[wordIndex];
 
-
   boolean forceMatch = random(1) < 0.5;
   if (forceMatch) {
     currentColor = colors[wordIndex];  
@@ -139,16 +133,14 @@ void generateNewQuestion() {
     isMatch = false;
   }
 
-
   if (currentColor == white || currentColor == lightBlue || currentColor == #FBFF1A) {
     textColor = #0A0A0A;
   } else {
     textColor = currentColor;
   }
 
-
   timerStart = millis();
-  circleSize = 200;
+  textSizeAnim = 32;  // Reset word size
 }
 
 void mousePressed() {
