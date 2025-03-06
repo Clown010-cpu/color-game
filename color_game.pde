@@ -2,38 +2,52 @@ import processing.sound.*;
 
 SoundFile music, successSound, failureSound;
 
-color lightBlue = #ADD8E6;  
-color white = #FFFFFF;      
-color green = #3EF702;      
-color red = #FF0307;        
+color lightBlue = #ADD8E6;
+color white = #FFFFFF;
+color green = #3EF702;
+color red = #FF0307;
 
 String[] words = {"RED", "BLUE", "GREEN", "YELLOW", "BLACK", "PURPLE", "ORANGE"};
 color[] colors = {#FF0307, #0365FF, #3EF702, #FBFF1A, #0A0A0A, #800080, #FFA500};
 
 String currentWord;
 color currentColor;
-color textColor; 
+color textColor;
 
-boolean isMatch; 
+boolean isMatch;
 
 int score = 0;
-int roundTime = 5;  
+int roundTime = 5;
 int timerStart;
 
-float textSizeAnim; 
+float textSizeAnim;
 
 String currentMode = "intro";
+
+PImage[] gif;
+int numberOfFrames;
+int f;
 
 void setup() {
   size(800, 600);
   textAlign(CENTER, CENTER);
-  
+
   music = new SoundFile(this, sketchPath("MUSIC.mp3"));
   successSound = new SoundFile(this, sketchPath("SUCCESS.wav"));
   failureSound = new SoundFile(this, sketchPath("FAILURE.wav"));
 
   music.loop();
   generateNewQuestion();
+
+
+  numberOfFrames = 32;
+  gif = new PImage[numberOfFrames];
+
+  int i = 0;
+  while (i < numberOfFrames) {
+    gif[i] = loadImage("frame_"+i+"_delay-0.06s.gif");
+    i=i+1;
+  }
 }
 
 void draw() {
@@ -44,10 +58,17 @@ void draw() {
   } else if (currentMode.equals("gameOver")) {
     showGameOver();
   }
+
+ 
 }
 
 void showIntro() {
   background(lightBlue);
+   image(gif[f], 0, 0, width, height);
+  println(frameCount);
+  if (frameCount % 2 == 0) f = f + 1;
+  if (f == numberOfFrames) f = 0;
+  
   fill(red);
   textSize(48);
   text("Welcome to the Colour Game!", width / 2, height / 3);
@@ -64,26 +85,26 @@ void showIntro() {
 void showGame() {
   float elapsedTime = (millis() - timerStart) / 1000.0;
   float remainingTime = max(0, roundTime - elapsedTime);
-  
+
   if (remainingTime <= 0) {
-    currentMode = "gameOver";  
+    currentMode = "gameOver";
     return;
   }
 
   background(white);
-  
-  fill(lightBlue);
-  rect(0, 0, width / 2, height);  
-  fill(white);
-  rect(width / 2, 0, width / 2, height);  
 
-  
+  fill(lightBlue);
+  rect(0, 0, width / 2, height);
+  fill(white);
+  rect(width / 2, 0, width / 2, height);
+
+
   textSizeAnim = map(remainingTime, 0, roundTime, 100, 32);
   fill(textColor);
   textSize(textSizeAnim);
   text(currentWord, width / 2, height / 3);
 
- 
+
   fill(green);
   textSize(36);
   text("MATCH", width / 4, height - 50);
@@ -93,7 +114,7 @@ void showGame() {
   textSize(36);
   text("NOT MATCH", width * 3 / 4, height - 50);
 
- 
+
   fill(#050505);
   textSize(24);
   text("Score: " + score, width / 2, 50);
@@ -122,13 +143,13 @@ void generateNewQuestion() {
 
   boolean forceMatch = random(1) < 0.5;
   if (forceMatch) {
-    currentColor = colors[wordIndex];  
+    currentColor = colors[wordIndex];
     isMatch = true;
   } else {
     int colorIndex;
     do {
       colorIndex = int(random(colors.length));
-    } while (colorIndex == wordIndex);  
+    } while (colorIndex == wordIndex);
     currentColor = colors[colorIndex];
     isMatch = false;
   }
@@ -140,7 +161,7 @@ void generateNewQuestion() {
   }
 
   timerStart = millis();
-  textSizeAnim = 32;  
+  textSizeAnim = 32;
 }
 
 void mousePressed() {
